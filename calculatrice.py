@@ -8,6 +8,7 @@ class Calculatrice():
     def __init__(self):
         self.root = tk.Tk()
         self.root.title('Calculatrice')
+        self.root.bind('<Key>', self.press_key)
         self.root.config(bg='#FFFFFF')
         self.grid_format()
         
@@ -42,8 +43,9 @@ class Calculatrice():
         self.root.mainloop()
         
 # ----------------------------- CREATING WIDGETS ------------------------------
-        
+
     def grid_format(self):
+        """Set the size of rows and columns."""
         for column in range(0, 4, 1):
             self.root.grid_columnconfigure(column, minsize=75)
        
@@ -51,40 +53,43 @@ class Calculatrice():
             self.root.grid_rowconfigure(row, minsize=75)
         
     def entry(self, x, y):
-        """ Creates an input field and puts a number zero in it """
+        """Create an input field and puts a number zero in it."""
         self.entry = tk.Entry(self.root, justify='right', relief=tk.FLAT, font=('Verdana', 20))
         self.entry.insert(0, '0')
         self.entry.grid(row=x, column=y, columnspan=5, sticky='we', padx=2, pady=2)
     
     def number_button(self, symbol, x, y):
-        """ Creates a button entering a digit or a dot """
+        """Create a button entering a digit or a dot."""
         self.button = tk.Button(self.root, text=symbol, bg='#FFFFFF', relief=tk.FLAT, font=('Verdana', 15), 
                                 command=lambda : self.click_number_button(symbol))
         self.button.grid(row=x, column=y, sticky='wens', padx=2, pady=2)
         
     def operation_button(self, symbol, x, y):
-        """ Creates an operation button """
+        """Create an operation button."""
         self.button = tk.Button(self.root, text=symbol, bg='#CFCFCF', relief=tk.FLAT, font=('Verdana', 15), 
                                 command=lambda : self.click_operation_button(symbol))
         self.button.grid(row=x, column=y, sticky='wens', padx=2, pady=2)
     
     def bracket_button(self, symbol, x, y):
-        """ Creates a bracket button """
+        """Create a bracket button."""
         self.button = tk.Button(self.root, text=symbol, bg='#CFCFCF', relief=tk.FLAT, font=('Verdana', 15), 
                                 command=lambda : self.click_bracket_button(symbol))
         self.button.grid(row=x, column=y, sticky='wens', padx=2, pady=2)    
     
     def result_button(self, symbol, x, y):
+        """Create the button calculating the entered expression."""
         self.button = tk.Button(self.root, text=symbol, bg='#4890E1', relief=tk.FLAT, font=('Verdana', 15), 
                                 command=self.calculate)
         self.button.grid(row=x, column=y, sticky='wens', padx=2, pady=2)
 
     def remove_button(self, symbol, x, y):
+        """Create the backspace button."""
         self.button = tk.Button(self.root, text=symbol, bg='#CFCFCF', relief=tk.FLAT, font=('Verdana', 15), 
                                 command=self.click_remove_button)
         self.button.grid(row=x, column=y, sticky='wens', padx=2, pady=2)
     
     def allclear_button(self, symbol, x, y):
+        """Create the button clearing the entry field."""
         self.button = tk.Button(self.root, text=symbol, bg='#CFCFCF', relief=tk.FLAT, font=('Verdana', 15), 
                                 command=self.click_allclear_button)
         self.button.grid(row=x, column=y, sticky='wens', padx=2, pady=2)
@@ -92,25 +97,24 @@ class Calculatrice():
 # ------------------------------- PROGRAM LOGIC -------------------------------
 
     def click_allclear_button(self):
-        """ Clears the entry field """
+        """Clear the entry field."""
         self.entry.delete(0, tk.END)
         self.entry.insert(0, '0')
     
     def click_remove_button(self):
-        """ Removes the last entered character """
+        """Remove the last entered character."""
         self.string = self.entry.get()
         self.entry.delete(0, tk.END)
         self.entry.insert(0, self.string[0:-1])
     
     def click_number_button(self, symbol):
-        """ Enters digits
+        """Enter digits.
         
-        The starting zero is replaced by the entered digit. The starting zero 
-        is saved, if the second character is a dot. If a dot is entered 
-        after an operation character, a zero is inserted before it, for example 
+        The starting zero is replaced by the entered digit. The starting zero
+        is saved, if the second character is a dot. If a dot is entered
+        after an operation character, a zero is inserted before it, for example
         '5*.2' is replaced by '5*0.2'.
-        """
-        
+        """        
         self.string = self.entry.get()
         if self.string == '0' and symbol != '.':
             self.string = self.string[1:]
@@ -120,15 +124,14 @@ class Calculatrice():
         self.entry.insert(tk.END, self.string + symbol)
         
     def click_bracket_button(self, symbol):
-        """ Enters brackets 
+        """Enter brackets.
         
-        An opening bracket is entered only after the operation character, 
-        or after another opening bracket or at the beginning, otherwise an error 
-        message is displayed. A closing bracket is entered only after 
-        a number character and only if the number of opening brackets does not 
+        An opening bracket is entered only after the operation character,
+        or after another opening bracket or at the beginning, otherwise an error
+        message is displayed. A closing bracket is entered only after
+        a number character and only if the number of opening brackets does not
         exceed the number of closing brackets, including the entered one.
         """
-        
         self.string = self.entry.get()
         if self.string == '0' and symbol == '(':
             self.string = self.string[1:]
@@ -142,14 +145,13 @@ class Calculatrice():
             self.entry.insert(tk.END, symbol)
         
     def click_operation_button(self, symbol):
-        """ Enters operation characters
+        """Enter operation characters.
         
-        Enters an operation character after a number or a bracket. If an operation 
-        character is enterd after another operation character, the previous one 
-        is deleted. Negative numbers can be entered only at the beginning of 
+        Enters an operation character after a number or a bracket. If an operation
+        character is entered after another operation character, the previous one
+        is deleted. Negative numbers can be entered only at the beginning of
         an expression or after an opening bracket.
         """
-        
         self.string = self.entry.get()
         if self.string != '0' and self.string[-1] in '+-*/':
             self.string = self.string[:-1]
@@ -157,12 +159,28 @@ class Calculatrice():
             self.string = ''
         self.entry.delete(0, tk.END)
         self.entry.insert(0, self.string + symbol)
-
+        
     def calculate(self):
-        """ Calculates the entered expression and outputs the result """
+        """Calculate the entered expression and outputs the result."""
         self.string = self.entry.get()
         self.entry.delete(0, tk.END)
         self.entry.insert(0, eval(self.string))
+        
+    def press_key(self, event):
+        """Link keys with the main window.
+        
+        Keys: operation keys, number keys, dot, brackets, backspace, enter.
+        """
+        if event.char.isdigit() or event.char == '.':
+            self.click_number_button(event.char)
+        elif event.char in '+-*/':
+            self.click_operation_button(event.char)
+        elif event.char in '()':
+            self.click_bracket_button(event.char)
+        elif event.char == '\x08':
+            self.click_remove_button()
+        elif event.char == '\r':
+            self.calculate()
     
 # -----------------------------------------------------------------------------
 

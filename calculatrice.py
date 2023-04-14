@@ -106,6 +106,8 @@ class Calculatrice():
         self.string = self.entry.get()
         self.entry.delete(0, tk.END)
         self.entry.insert(0, self.string[0:-1])
+        if len(self.string) == 1:
+            self.entry.insert(0, '0')
     
     def click_number_button(self, symbol):
         """Enter digits.
@@ -147,7 +149,7 @@ class Calculatrice():
     def click_operation_button(self, symbol):
         """Enter operation characters.
         
-        Enters an operation character after a number or a bracket. If an operation
+        Enter an operation character after a number or a bracket. If an operation
         character is entered after another operation character, the previous one
         is deleted. Negative numbers can be entered only at the beginning of
         an expression or after an opening bracket.

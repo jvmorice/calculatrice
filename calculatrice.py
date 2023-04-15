@@ -152,13 +152,17 @@ class Calculatrice():
         Enter an operation character after a number or a bracket. If an operation
         character is entered after another operation character, the previous one
         is deleted. Negative numbers can be entered only at the beginning of
-        an expression or after an opening bracket.
+        an expression or after an opening bracket. If an operation character is
+        entered after the dot, the dot is deleted, for example '5.+' is
+        replaced by '5+'.
         """
         self.string = self.entry.get()
         if self.string != '0' and self.string[-1] in '+-*/':
             self.string = self.string[:-1]
         elif self.string == '0' and symbol == '-':
             self.string = ''
+        elif self.string[-1] == '.':
+            self.string = self.string[:-1]
         self.entry.delete(0, tk.END)
         self.entry.insert(0, self.string + symbol)
         

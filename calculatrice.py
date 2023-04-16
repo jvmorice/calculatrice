@@ -11,7 +11,6 @@ class Calculatrice():
         self.root = tk.Tk()
         self.root.title('Calculatrice')
         self.root.resizable(False, False)
-        self.root.bind('<Key>', self.press_key)
 
         self.entry_font = ('Verdana', 20)
         self.button_font = ('Verdana', 15)
@@ -20,6 +19,7 @@ class Calculatrice():
         self.entry_field(0, 0)
 
         self.string = ''
+        self.control = ''
 
         self.allclear_button('AC', 1, 0)
         self.bracket_button('(', 1, 1)
@@ -48,6 +48,7 @@ class Calculatrice():
 
     def run(self):
         """Call the window and keep it open."""
+        self.root.bind('<Key>', self.press_key)
         self.root.mainloop()
 
 # ----------------------------- CREATING WIDGETS ------------------------------
@@ -147,6 +148,9 @@ class Calculatrice():
         entered one.
         """
         self.string = self.entry.get()
+        if self.control == '*':
+            self.string = '0'
+            self.control = ''
         if self.string == '0' and symbol == '(':
             self.string = self.string[1:] + symbol
         elif self.string[-1].isdigit() and symbol == '(':
@@ -158,7 +162,7 @@ class Calculatrice():
         elif self.string.count('(') > self.string.count(')') and symbol == ')':
             self.string = self.string + symbol
         self.entry.delete(0, tk.END)
-        self.entry.insert(tk.END, self.string)
+        self.entry.insert(0, self.string)
 
     def click_number_button(self, symbol):
         """Enter digits.
@@ -169,13 +173,16 @@ class Calculatrice():
         '5*.2' is replaced by '5*0.2'.
         """
         self.string = self.entry.get()
+        if self.control == '*':
+            self.string = '0'
+            self.control = ''
         if self.string == '0' and symbol != '.':
             self.string = self.string[1:]
         elif self.string[-1] in '+-*/' and symbol == '.':
             self.string = self.string + '0'
         self.string = self.string + symbol
         self.entry.delete(0, tk.END)
-        self.entry.insert(tk.END, self.string)
+        self.entry.insert(0, self.string)
 
     def click_operation_button(self, symbol):
         """Enter operation characters.
@@ -186,6 +193,9 @@ class Calculatrice():
         the dot, the dot is deleted, for example '5.+' is replaced by '5+'.
         """
         self.string = self.entry.get()
+        if self.control == '*':
+            self.string = '0'
+            self.control = ''
         if self.string != ('0' or '-') and self.string[-1] in '+-*/':
             self.string = self.string[:-1]
         elif self.string == '0' and symbol == '-':
@@ -217,6 +227,7 @@ class Calculatrice():
             self.string = 'Error'
         self.entry.delete(0, tk.END)
         self.entry.insert(0, self.string)
+        self.control = '*'
 
     def press_key(self, event):
         """Link keys with the main window.

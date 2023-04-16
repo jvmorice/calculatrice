@@ -1,5 +1,7 @@
+"""Just another calculator in Python."""
+
 import tkinter as tk
-import tkinter.messagebox as mb
+
 
 class Calculatrice():
 
@@ -171,35 +173,50 @@ class Calculatrice():
             self.string = self.string[1:]
         elif self.string[-1] in '+-*/' and symbol == '.':
             self.string = self.string + '0'
+        self.string = self.string + symbol
         self.entry.delete(0, tk.END)
-        self.entry.insert(tk.END, self.string + symbol)
-
+        self.entry.insert(tk.END, self.string)
 
     def click_operation_button(self, symbol):
         """Enter operation characters.
 
-        Enter an operation character after a number or a bracket. If an operation
-        character is entered after another operation character, the previous one
-        is deleted. Negative numbers can be entered only at the beginning of
-        an expression or after an opening bracket. If an operation character is
-        entered after the dot, the dot is deleted, for example '5.+' is
-        replaced by '5+'.
+        Enter an operation character after a number or a bracket.
+        If an operation character is entered after another operation character,
+        the previous one is deleted. If an operation character is entered after
+        the dot, the dot is deleted, for example '5.+' is replaced by '5+'.
         """
         self.string = self.entry.get()
-        if self.string != '0' and self.string[-1] in '+-*/':
+        if self.string != ('0' or '-') and self.string[-1] in '+-*/':
             self.string = self.string[:-1]
         elif self.string == '0' and symbol == '-':
             self.string = ''
         elif self.string[-1] == '.':
             self.string = self.string[:-1]
+        self.string = self.string + symbol
         self.entry.delete(0, tk.END)
-        self.entry.insert(0, self.string + symbol)
+        self.entry.insert(0, self.string)
 
     def calculate(self):
-        """Calculate the entered expression and outputs the result."""
+        """Calculate the entered expression and output the result.
+
+        If the result of the calculation is a float with a zero after the dot,
+        it is converted to integer, for example '2.0' is converted to '2'.
+        If a NameError, a SyntaxError or a ZeroDivisionError occurs, a message
+        is displayed in the entry field.
+        """
         self.string = self.entry.get()
+        try:
+            eval(self.string)
+            if eval(self.string) * 10 % 10 == 0:
+                self.string = int(eval(self.string))
+            else:
+                self.string = eval(self.string)
+        except ZeroDivisionError:
+            self.string = 'Division by zero'
+        except (NameError, SyntaxError):
+            self.string = 'Error'
         self.entry.delete(0, tk.END)
-        self.entry.insert(0, eval(self.string))
+        self.entry.insert(0, self.string)
 
     def press_key(self, event):
         """Link keys with the main window.

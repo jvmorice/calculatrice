@@ -117,10 +117,14 @@ class Calculatrice():
 
 # ------------------------------- PROGRAM LOGIC -------------------------------
 
+    def display(self, string):
+        self.entry.delete(0, tk.END)
+        self.entry.insert(0, self.string)
+
     def click_allclear_button(self):
         """Clear the entry field and place an initial zero in it."""
-        self.entry.delete(0, tk.END)
-        self.entry.insert(0, '0')
+        self.string = '0'
+        self.display(self.string)
 
     def click_remove_button(self):
         """Remove the last entered character.
@@ -129,10 +133,9 @@ class Calculatrice():
         """
         self.string = self.entry.get()
         self.string = self.string[:-1]
-        self.entry.delete(0, tk.END)
-        self.entry.insert(0, self.string)
         if len(self.string) == 0:
-            self.entry.insert(0, '0')
+            self.string = '0'
+        self.display(self.string)
 
     def click_bracket_button(self, symbol):
         """Enter brackets.
@@ -161,8 +164,7 @@ class Calculatrice():
             self.string = self.string
         elif self.string.count('(') > self.string.count(')') and symbol == ')':
             self.string = self.string + symbol
-        self.entry.delete(0, tk.END)
-        self.entry.insert(0, self.string)
+        self.display(self.string)
 
     def click_number_button(self, symbol):
         """Enter digits.
@@ -181,8 +183,7 @@ class Calculatrice():
         elif self.string[-1] in '+-*/' and symbol == '.':
             self.string = self.string + '0'
         self.string = self.string + symbol
-        self.entry.delete(0, tk.END)
-        self.entry.insert(0, self.string)
+        self.display(self.string)
 
     def click_operation_button(self, symbol):
         """Enter operation characters.
@@ -203,8 +204,7 @@ class Calculatrice():
         elif self.string[-1] == '.':
             self.string = self.string[:-1]
         self.string = self.string + symbol
-        self.entry.delete(0, tk.END)
-        self.entry.insert(0, self.string)
+        self.display(self.string)
 
     def calculate(self):
         """Calculate the entered expression and output the result.
@@ -225,8 +225,7 @@ class Calculatrice():
             self.string = 'Division by zero'
         except (NameError, SyntaxError):
             self.string = 'Error'
-        self.entry.delete(0, tk.END)
-        self.entry.insert(0, self.string)
+        self.display(self.string)
         self.control = '*'
 
     def press_key(self, event):

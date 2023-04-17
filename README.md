@@ -1,2 +1,2 @@
 # calculatrice
-Another calculator in Python
+Just another calculator in Python

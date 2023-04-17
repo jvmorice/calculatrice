@@ -12,14 +12,14 @@ class Calculatrice():
         self.root.title('Calculatrice')
         self.root.resizable(False, False)
 
+        self.string = ''
+        self.control = ''
+
         self.entry_font = ('Verdana', 20)
         self.button_font = ('Verdana', 15)
 
         self.main_frame()
         self.entry_field(0, 0)
-
-        self.string = ''
-        self.control = ''
 
         self.allclear_button('AC', 1, 0)
         self.bracket_button('(', 1, 1)
@@ -121,6 +121,12 @@ class Calculatrice():
         self.entry.delete(0, tk.END)
         self.entry.insert(0, self.string)
 
+    def is_result(self):
+        """Verify if the number in the entry is a result of a calculation."""
+        if self.control == '*':
+            self.string = '0'
+            self.control = ''
+
     def click_allclear_button(self):
         """Clear the entry field and place an initial zero in it."""
         self.string = '0'
@@ -151,9 +157,7 @@ class Calculatrice():
         entered one.
         """
         self.string = self.entry.get()
-        if self.control == '*':
-            self.string = '0'
-            self.control = ''
+        self.is_result()
         if self.string == '0' and symbol == '(':
             self.string = self.string[1:] + symbol
         elif self.string[-1].isdigit() and symbol == '(':
@@ -175,9 +179,7 @@ class Calculatrice():
         '5*.2' is replaced by '5*0.2'.
         """
         self.string = self.entry.get()
-        if self.control == '*':
-            self.string = '0'
-            self.control = ''
+        self.is_result()
         if self.string == '0' and symbol != '.':
             self.string = self.string[1:]
         elif self.string[-1] in '+-*/' and symbol == '.':
@@ -194,9 +196,7 @@ class Calculatrice():
         the dot, the dot is deleted, for example '5.+' is replaced by '5+'.
         """
         self.string = self.entry.get()
-        if self.control == '*':
-            self.string = '0'
-            self.control = ''
+        self.is_result()
         if self.string != ('0' or '-') and self.string[-1] in '+-*/':
             self.string = self.string[:-1]
         elif self.string == '0' and symbol == '-':

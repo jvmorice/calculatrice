@@ -144,18 +144,7 @@ class Calculatrice():
         self.display(self.string)
 
     def click_bracket_button(self, symbol):
-        """Enter brackets.
-
-        If an opening bracket is entered after a digit, the multiplication sign
-        is placed before the bracket.
-        If an opening bracket is entered after the dot, the dot is deleted and
-        the multiplication sign is placed between the digit and the bracket.
-        If a closing bracket is entered right after the opening one,
-        the input of the closing bracket is blocked.
-        A closing bracket can be entered only if the number of opening brackets
-        does not exceed the number of closing brackets, including the
-        entered one.
-        """
+        """Enter brackets, do auto-replacements to avoid errors."""
         self.string = self.entry.get()
         self.is_result()
         if self.string == '0' and symbol == '(':
@@ -164,67 +153,71 @@ class Calculatrice():
             self.string = self.string + '*' + symbol
         elif self.string[-1] == '.' and symbol == '(':
             self.string = self.string[:-1] + '*' + symbol
-        elif self.string[-1] == '(' and symbol == ')':
+        elif self.string[-1] == ')' and symbol == '(':
+            self.string = self.string + '*' + symbol
+        elif self.string[-1] == '.' and symbol == ')':
+            self.string = self.string[:-1] + symbol
+        elif self.string[-1] in '(+-*/' and symbol == ')':
             self.string = self.string
-        elif self.string.count('(') > self.string.count(')') and symbol == ')':
+        elif self.string.count('(') == self.string.count(')') and symbol == ')':
+            self.string = self.string
+        else:
             self.string = self.string + symbol
         self.display(self.string)
 
     def click_number_button(self, symbol):
-        """Enter digits.
-
-        The initial zero is replaced by the entered digit. The initial zero
-        is saved, if the second character is a dot. If a dot is entered
-        after an operation character, a zero is inserted before it, for example
-        '5*.2' is replaced by '5*0.2'.
-        """
+        """Enter digits, do auto-replacements to avoid errors."""
         self.string = self.entry.get()
         self.is_result()
-        if self.string == '0' and symbol != '.':
+        if self.string == '0' and symbol.isdigit():
             self.string = self.string[1:]
-        elif self.string[-1] in '+-*/' and symbol == '.':
+        elif self.string[-1] == '0' and symbol == '.':
+            self.string = self.string
+        elif self.string[-1] == '.' and symbol == '.':
+            self.string = self.string.rstrip('.')
+        elif self.string[-1] in '(+-*/' and symbol == '.':
             self.string = self.string + '0'
+        elif self.string[-1] == ')' and symbol == '.':
+            self.string = self.string + '*0'
+        elif self.string[-1] == ')' and symbol.isdigit():
+            self.string = self.string + '*'
         self.string = self.string + symbol
         self.display(self.string)
 
     def click_operation_button(self, symbol):
-        """Enter operation characters.
-
-        Enter an operation character after a number or a bracket.
-        If an operation character is entered after another operation character,
-        the previous one is deleted. If an operation character is entered after
-        the dot, the dot is deleted, for example '5.+' is replaced by '5+'.
-        """
+        """Enter operation characters, do auto-replacements to avoid errors."""
         self.string = self.entry.get()
         self.is_result()
-        if self.string != ('0' or '-') and self.string[-1] in '+-*/':
-            self.string = self.string[:-1]
-        elif self.string == '0' and symbol == '-':
-            self.string = ''
+        if self.string == '0' and symbol == '-':
+            self.string = self.string[1:] + symbol
+        elif self.string == '0' and symbol != '-':
+            self.string = self.string + symbol
+        elif len(self.string) > 1 and self.string[-1] in '+-*/':
+            self.string = self.string[:-1] + symbol
+        elif self.string == '-':
+            self.string = self.string
         elif self.string[-1] == '.':
-            self.string = self.string[:-1]
-        self.string = self.string + symbol
+            self.string = self.string[:-1] + symbol
+        elif self.string[-1] == '(' and symbol != '-':
+            self.string = self.string
+        else:
+            self.string = self.string + symbol
         self.display(self.string)
 
     def calculate(self):
-        """Calculate the entered expression and output the result.
-
-        If the result of the calculation is a float with a zero after the dot,
-        it is converted to integer, for example '2.0' is converted to '2'.
-        If a NameError, a SyntaxError or a ZeroDivisionError occurs, a message
-        is displayed in the entry field.
-        """
+        """Calculate the entered expression and output the result."""
         self.string = self.entry.get()
-        try:
-            eval(self.string)
-            if eval(self.string) * 10 % 10 == 0:
-                self.string = int(eval(self.string))
-            else:
-                self.string = eval(self.string)
-        except ZeroDivisionError:
-            self.string = 'Division by zero'
-        except (NameError, SyntaxError):
-            self.string = 'Error'
+        if self.string[-1].isdigit() or self.string[-1] == ')':
+            try:
+                eval(self.string)
+                if eval(self.string) * 10 % 10 == 0:
+                    self.string = int(eval(self.string))
+                else:
+                    self.string = eval(self.string)
+            except ZeroDivisionError:
+                self.string = 'Division by zero'
+            except (NameError, SyntaxError):
+                self.string = 'Error'
         self.display(self.string)
         self.control = '*'
 

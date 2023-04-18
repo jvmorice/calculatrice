@@ -4,6 +4,7 @@ import tkinter as tk
 
 
 class Calculatrice():
+    """A simple calculator."""
 
 # -------------------------------- MAIN WINDOW --------------------------------
 
@@ -15,36 +16,38 @@ class Calculatrice():
         self.string = ''
         self.control = ''
 
+        self.label_font = ('Verdana', 15)
         self.entry_font = ('Verdana', 20)
         self.button_font = ('Verdana', 15)
 
         self.main_frame()
-        self.entry_field(0, 0)
+        self.result_label(0, 0)
+        self.entry_field(1, 0)
 
-        self.allclear_button('AC', 1, 0)
-        self.bracket_button('(', 1, 1)
-        self.bracket_button(')', 1, 2)
-        self.remove_button('⌫', 1, 3)
+        self.allclear_button('AC', 2, 0)
+        self.bracket_button('(', 2, 1)
+        self.bracket_button(')', 2, 2)
+        self.remove_button('⌫', 2, 3)
 
-        self.number_button('7', 2, 0)
-        self.number_button('8', 2, 1)
-        self.number_button('9', 2, 2)
-        self.operation_button('/', 2, 3)
+        self.number_button('7', 3, 0)
+        self.number_button('8', 3, 1)
+        self.number_button('9', 3, 2)
+        self.operation_button('/', 3, 3)
 
-        self.number_button('4', 3, 0)
-        self.number_button('5', 3, 1)
-        self.number_button('6', 3, 2)
-        self.operation_button('*', 3, 3)
+        self.number_button('4', 4, 0)
+        self.number_button('5', 4, 1)
+        self.number_button('6', 4, 2)
+        self.operation_button('*', 4, 3)
 
-        self.number_button('1', 4, 0)
-        self.number_button('2', 4, 1)
-        self.number_button('3', 4, 2)
-        self.operation_button('-', 4, 3)
+        self.number_button('1', 5, 0)
+        self.number_button('2', 5, 1)
+        self.number_button('3', 5, 2)
+        self.operation_button('-', 5, 3)
 
-        self.number_button('0', 5, 0)
-        self.number_button('.', 5, 1)
-        self.result_button('=', 5, 2)
-        self.operation_button('+', 5, 3)
+        self.number_button('0', 6, 0)
+        self.number_button('.', 6, 1)
+        self.result_button('=', 6, 2)
+        self.operation_button('+', 6, 3)
 
     def run(self):
         """Call the window and keep it open."""
@@ -58,13 +61,22 @@ class Calculatrice():
         self.frame = tk.Frame(self.root, padx=30, pady=30, bg='#FFFFFF')
         for col in range(0, 4, 1):
             self.frame.columnconfigure(col, minsize=75, weight=1)
-        for row in range(1, 6, 1):
+        for row in range(2, 7, 1):
             self.frame.rowconfigure(row, minsize=75, weight=1)
         self.frame.pack()
+
+    def result_label(self, row, col):
+        """Create a field where the calculated expression is displayed."""
+        self.label = tk.Label(self.frame, anchor='e', relief=tk.FLAT,
+                              background='#FFFFFF', foreground='#555555',
+                              font=self.label_font)
+        self.label.grid(row=row, column=col, columnspan=5,
+                        sticky='we', padx=2, pady=2)
 
     def entry_field(self, row, col):
         """Create an input field and puts a number zero in it."""
         self.entry = tk.Entry(self.frame, justify='right', relief=tk.FLAT,
+                              background='#FFFFFF', foreground='#000000',
                               font=self.entry_font)
         self.entry.insert(0, '0')
         self.entry.grid(row=row, column=col, columnspan=5,
@@ -118,11 +130,14 @@ class Calculatrice():
 # ------------------------------- PROGRAM LOGIC -------------------------------
 
     def display(self, string):
+        """Display the character input."""
         self.entry.delete(0, tk.END)
         self.entry.insert(0, self.string)
 
     def is_result(self):
         """Verify if the number in the entry is a result of a calculation."""
+        self.string = self.entry.get()
+        self.label.config(text=self.string)
         if self.control == '*':
             self.string = '0'
             self.control = ''
@@ -131,6 +146,7 @@ class Calculatrice():
         """Clear the entry field and place an initial zero in it."""
         self.string = '0'
         self.display(self.string)
+        self.label.config(text='')
 
     def click_remove_button(self):
         """Remove the last entered character.
@@ -141,6 +157,7 @@ class Calculatrice():
         self.string = self.string[:-1]
         if len(self.string) == 0:
             self.string = '0'
+            self.label.config(text='')
         self.display(self.string)
 
     def click_bracket_button(self, symbol):
@@ -207,6 +224,7 @@ class Calculatrice():
     def calculate(self):
         """Calculate the entered expression and output the result."""
         self.string = self.entry.get()
+        self.label.config(text=self.string+'=')
         if self.string[-1].isdigit() or self.string[-1] == ')':
             try:
                 eval(self.string)

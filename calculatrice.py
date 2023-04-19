@@ -162,20 +162,17 @@ class Calculatrice():
 
     def click_bracket_button(self, symbol):
         """Enter brackets, do auto-replacements to avoid errors."""
+        dict_enter_brackets = {'.(': '*(', ')(': ')*(', '.)': '.', '()': '(',
+                               '*)': '*', '-)': '-', '+)': '+', '/)': '/'}
         self.string = self.entry.get()
         self.is_result()
         if self.string == '0' and symbol == '(':
             self.string = self.string[1:] + symbol
         elif self.string[-1].isdigit() and symbol == '(':
             self.string = self.string + '*' + symbol
-        elif self.string[-1] == '.' and symbol == '(':
-            self.string = self.string[:-1] + '*' + symbol
-        elif self.string[-1] == ')' and symbol == '(':
-            self.string = self.string + '*' + symbol
-        elif self.string[-1] == '.' and symbol == ')':
-            self.string = self.string[:-1] + symbol
-        elif self.string[-1] in '(+-*/' and symbol == ')':
-            self.string = self.string
+        elif (self.string[-1] + symbol) in dict_enter_brackets:
+            self.string = self.string[:-1] + \
+                dict_enter_brackets.get(self.string[-1] + symbol)
         elif self.string.count('(') == self.string.count(')') and symbol == ')':
             self.string = self.string
         else:
@@ -184,21 +181,19 @@ class Calculatrice():
 
     def click_number_button(self, symbol):
         """Enter digits, do auto-replacements to avoid errors."""
+        dict_enter_number = {'..': '.', '(.': '(0.', '*.': '*0.', '-.': '-0.',
+                             '+.': '+0.', '/.': '/0.', ').': ')*0.'}
         self.string = self.entry.get()
         self.is_result()
         if self.string == '0' and symbol.isdigit():
-            self.string = self.string[1:]
-        elif self.string[-1] == '0' and symbol == '.':
-            self.string = self.string
-        elif self.string[-1] == '.' and symbol == '.':
-            self.string = self.string.rstrip('.')
-        elif self.string[-1] in '(+-*/' and symbol == '.':
-            self.string = self.string + '0'
-        elif self.string[-1] == ')' and symbol == '.':
-            self.string = self.string + '*0'
+            self.string = self.string[1:] + symbol
         elif self.string[-1] == ')' and symbol.isdigit():
-            self.string = self.string + '*'
-        self.string = self.string + symbol
+            self.string = self.string + '*' + symbol
+        elif (self.string[-1] + symbol) in dict_enter_number:
+            self.string = self.string[:-1] + \
+                dict_enter_number.get(self.string[-1] + symbol)
+        else:
+            self.string = self.string + symbol
         self.display(self.string)
 
     def click_operation_button(self, symbol):
@@ -224,7 +219,7 @@ class Calculatrice():
     def calculate(self):
         """Calculate the entered expression and output the result."""
         self.string = self.entry.get()
-        self.label.config(text=self.string+'=')
+        self.label.config(text=self.string + '=')
         if self.string[-1].isdigit() or self.string[-1] == ')':
             try:
                 eval(self.string)
@@ -254,8 +249,6 @@ class Calculatrice():
             self.click_remove_button()
         elif event.char == '\r':
             self.calculate()
-
-# -----------------------------------------------------------------------------
 
 
 calculatrice = Calculatrice()
